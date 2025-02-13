@@ -6,14 +6,15 @@ async function getProfile() {
   }
 
   try {
-    // Fetch UUID
+    // Fetch UUID directly from Mojang API (CORS is supported)
     const uuidResponse = await fetch(
-      `/api/users/profiles/minecraft/${username}`
+      `https://corsjangapi.b-cdn.net/users/profiles/minecraft/${username}`
     );
     if (!uuidResponse.ok) {
       if (uuidResponse.status === 404) {
         alert("Username not found.");
-      } else if (uuidResponse.status === 500) {
+      } else if (uuidResponse.status === 429) {
+        // Corrected status code for rate limiting
         alert("Too many requests. Please try again later.");
       } else {
         throw new Error(`Error: ${uuidResponse.status}`);
@@ -26,26 +27,24 @@ async function getProfile() {
       "$1-$2-$3-$4-$5"
     );
 
-    // Fetch username from UUID (for case)
+    // Fetch username from UUID (for case) directly from Mojang (CORS is supported)
     const usernameData = await getUsernameFromUUID(uuid);
     const correctUsername = usernameData.username;
 
-    // Get stat data
-    const statsResponse = await fetch(`/api/stats/${uuid}`);
+    // Get stat data from a JSON file
+    const statsResponse = await fetch(
+      `https://raw.githubusercontent.com/LichenTown/player-stats/main/stats/${uuid}.json`
+    ); // Fetch from /stats/ directory
     if (!statsResponse.ok) {
       alert("Invalid player. Please try again.");
       return;
     }
     const statsData = await statsResponse.json();
-
-    // Check if the player is currently online or not
     const serverStatus = await getServerStatus(uuid);
-
-    // Update profile info and display statistics
     updateProfileInfo(correctUsername, serverStatus, uuid);
 
-    const sortedStats = sortStats(statsData.stats); // Call sortStats
-    displayStats(sortedStats); // Pass the SORTED stats to displayStats
+    const sortedStats = sortStats(statsData.stats);
+    displayStats(sortedStats);
 
     displaySelectedStats(statsData.stats);
   } catch (error) {
@@ -55,24 +54,34 @@ async function getProfile() {
 }
 
 async function getUsernameFromUUID(uuid) {
-  const response = await fetch(`/api/users/by-uuid/${uuid}`);
+  const response = await fetch(
+    `https://corsjangsessionserver.b-cdn.net/session/minecraft/profile/${uuid}`
+  );
   if (!response.ok) {
     throw new Error(`Error fetching username: ${response.status}`);
   }
-  return await response.json();
+  const data = await response.json();
+  return { username: data.name };
 }
 
 async function getServerStatus(uuid) {
   try {
-    const response = await fetch(`/api/server-status/${uuid}`);
+    const response = await fetch(
+      `https://api.mcstatus.io/v2/status/java/lichen.town?uuid=${uuid}`
+    );
     if (!response.ok) {
       throw new Error(`Server status error: ${response.status}`);
     }
     const data = await response.json();
-    return data.online;
+    const playerOnline =
+      data.players.online > 0 &&
+      data.players.list.some(
+        (player) => player.uuid.replace(/-/g, "") === uuid.replace(/-/g, "")
+      );
+    return playerOnline;
   } catch (error) {
     console.error("Error fetching server status:", error);
-    return { online: false };
+    return false;
   }
 }
 
@@ -351,7 +360,7 @@ document.getElementById("username").addEventListener("keydown", (event) => {
 async function displayLastCommitDate() {
   try {
     const response = await fetch(
-      `https://api.github.com/repos/palmmc/palmmc/commits?per_page=1`
+      `https://api.github.com/repos/LichenTown/Player-Lookup/commits?per_page=1`
     );
     if (!response.ok) {
       throw new Error(`GitHub API Error: ${response.status}`);
@@ -382,4 +391,4 @@ function formatDate(date) {
   return date.toLocaleDateString(undefined, options);
 }
 
-displayLastCommitDate("your-username", "your-repo-name");
+displayLastCommitDate();
