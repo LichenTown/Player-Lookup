@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Player Lookup</title>
+    <link rel="stylesheet" href="style.css" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, 
+user-scalable=no"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+      integrity="sha512-9usAa10IRO0HhonpyAIVpjrylPvoDwiPUiKdWk5t3PyolY1cOd4DSE0Ga+ri4AuTroPR5aQvXU9xC6qOPnzFeg=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    />
+  </head>
+  <body>
+    <div class="banner-container">
+      <div class="banner"></div>
+    </div>
+    <div class="container">
+      <div class="top-section">
+        <h1>Player Lookup</h1>
+
+        <div class="input-group">
+          <input
+            type="text"
+            id="username"
+            placeholder="Enter Minecraft Username"
+          />
+          <button onclick="getProfile()">Get Player</button>
+        </div>
+      </div>
+
+      <div class="profile-container">
+        <div class="profile-info">
+          <div class="avatar-container">
+            <img
+              id="player-avatar"
+              src="https://mc-heads.net/avatar/MHF_Steve"
+              alt="Player Avatar"
+            />
+          </div>
+          <div class="username-container">
+            <h2 id="player-username"></h2>
+          </div>
+          <div id="online-status">
+            <span class="status-indicator">
+              <i class="status-icon"></i> <span></span>
+            </span>
+          </div>
+          <div id="selected-stats">
+            <div class="stat-item">
+              <span class="stat-name">Time Played</span>
+              <span class="stat-value" id="time-played"></span>
+            </div>
+            <div class="stat-item">
+              <span class="stat-name">Deaths</span>
+              <span class="stat-value" id="deaths"></span>
+            </div>
+            <div class="stat-item">
+              <span class="stat-name">Time Since Last Death</span>
+              <span class="stat-value" id="time-since-last-death"></span>
+            </div>
+          </div>
+        </div>
+
+        <div class="stats-section">
+          <input type="text" id="search" placeholder="Search Statistics" />
+          <div id="stats"></div>
+        </div>
+        <div id="last-updated"></div>
+      </div>
+    </div>
+    <script src="script.js"></script>
+  </body>
+</html>
