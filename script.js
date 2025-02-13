@@ -360,7 +360,7 @@ document.getElementById("username").addEventListener("keydown", (event) => {
 async function displayLastCommitDate() {
   try {
     const response = await fetch(
-      `https://api.github.com/repos/LichenTown/Player-Lookup/commits?per_page=1`
+      `https://api.github.com/repos/LichenTown/player-stats/commits?per_page=1`
     );
     if (!response.ok) {
       throw new Error(`GitHub API Error: ${response.status}`);
